@@ -23,22 +23,27 @@ class DynamicGraphWindow(QMainWindow):
         # Timer to update the graph
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_graph)
-        self.timer.start(100)  # Update every 100 milliseconds
+        self.timer.start(1000)  # Update every 100 milliseconds
 
-        self.x_data = []
-        self.y_data = []
+            
+        self.x_data = [ i for i in range(50) ]
+        self.y_data = [ 0 for i in range(50) ]
+        
+        # print(self.x_data)
+
 
     def update_graph(self):
 
-        x = len(self.x_data)
+        # x = len(self.x_data)
         y = random.uniform(0, 100)
 
-        # if (len(self.x_data)>20):
-        #     self.x_data = self.x_data[1:]
-        #     self.y_data = self.y_data[1:]
-        
-        self.x_data.append(x)
+        if (len(self.y_data)==50):
+            self.y_data = self.y_data[1:]
+        # self.x_data.append(x)
         self.y_data.append(y)
+        
+            # self.x_data = self.x_data[1:]
+        
         self.curve.setData(self.x_data, self.y_data)
 
 
