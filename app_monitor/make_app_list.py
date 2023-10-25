@@ -49,18 +49,18 @@ def get_usr_app_list():
 
 def get_running_app_pids():
     apps = get_snap_app_list()
-    app_pids = []
+    app_pids = {}
 
     for app in apps:
         pid = os.popen(f"pgrep -o {app}").read()
         if pid:
-            app_pids.append(f"{app} : {int(pid)}")
+            app_pids[app] = int(pid)
         
     if len(app_pids) > 0:
         return app_pids
     else:
         print("No running snap applications found.")
-        return []
+        return {}
 
 
 
