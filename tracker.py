@@ -30,15 +30,16 @@ def monitor():
     with open("./apps_info/info.json") as old_app_pid_map_file:
         old_app_pid_map = json.loads(old_app_pid_map_file.read())
     
-    print("Status right now:",end=" ")
-    print(app_pid_map)
-    print()
+    # print("Status right now:",end=" ")
+    # print(app_pid_map)
+    # print()
 
     app_list = os.listdir("./apps/")
 
     for i in app_pid_map:
         if i not in old_app_pid_map:
             # a new app is install, will have to see it
+            print(app_pid_map)
             pass
         else:
             # this app is already being monitored

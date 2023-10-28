@@ -1,4 +1,6 @@
 {
     "Visual Studio Code" : "code",
-    "Spotify":"spotify"
+    "Spotify":"spotify",
+    "System Monitor":"gnome-system-mo",
+    "Calculator":"gnome-calculato"
 }

@@ -10,7 +10,6 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -21,8 +20,7 @@ class Ui_MainWindow(object):
         self.progressBar.setGeometry(QtCore.QRect(70, 90, 161, 31))
         self.progressBar.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.progressBar.setAutoFillBackground(False)
-        self.progressBar.setStyleSheet("selection-color: rgb(0, 85, 255);\n"
-"background-color: rgb(0, 0, 255);")
+        self.progressBar.setStyleSheet("selection-color: rgb(0, 85, 255);\n" "background-color: rgb(0, 0, 255);")
         self.progressBar.setMaximum(24)
         self.progressBar.setProperty("value", 6)
         self.progressBar.setOrientation(QtCore.Qt.Horizontal)
@@ -54,8 +52,7 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(-1)
         self.tabWidget.setFont(font)
-        self.tabWidget.setStyleSheet("font-size:16px;\n"
-"")
+        self.tabWidget.setStyleSheet("font-size:16px;\n" "")
         self.tabWidget.setTabPosition(QtWidgets.QTabWidget.North)
         self.tabWidget.setTabShape(QtWidgets.QTabWidget.Rounded)
         self.tabWidget.setIconSize(QtCore.QSize(40, 40))
@@ -73,22 +70,18 @@ class Ui_MainWindow(object):
         self.frame_7.setObjectName("frame_7")
         self.frame_8 = QtWidgets.QFrame(self.frame_7)
         self.frame_8.setGeometry(QtCore.QRect(10, 10, 61, 51))
-        self.frame_8.setStyleSheet("border-radius:10px;\n"
-"background-color: rgb(17, 181, 157);")
+        self.frame_8.setStyleSheet("border-radius:10px;\n" "background-color: rgb(17, 181, 157);")
         self.frame_8.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_8.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_8.setObjectName("frame_8")
         self.label_9 = QtWidgets.QLabel(self.frame_8)
         self.label_9.setGeometry(QtCore.QRect(0, 10, 61, 21))
-        self.label_9.setStyleSheet("font-weight:bold;\n"
-"color:white;\n"
-"")
+        self.label_9.setStyleSheet("font-weight:bold;\n" "color:white;\n" "")
         self.label_9.setAlignment(QtCore.Qt.AlignCenter)
         self.label_9.setObjectName("label_9")
         self.label_10 = QtWidgets.QLabel(self.frame_8)
         self.label_10.setGeometry(QtCore.QRect(4, 30, 51, 20))
-        self.label_10.setStyleSheet("color:white;\n"
-"font-size:12px;")
+        self.label_10.setStyleSheet("color:white;\n" "font-size:12px;")
         self.label_10.setAlignment(QtCore.Qt.AlignCenter)
         self.label_10.setObjectName("label_10")
         self.frame_9 = QtWidgets.QFrame(self.frame_7)
@@ -101,25 +94,19 @@ class Ui_MainWindow(object):
         self.label_11.setObjectName("label_11")
         self.label_12 = QtWidgets.QLabel(self.frame_9)
         self.label_12.setGeometry(QtCore.QRect(10, 30, 55, 21))
-        self.label_12.setStyleSheet("color: grey;\n"
-"font-size:13px;\n"
-"font-weight:bold;")
+        self.label_12.setStyleSheet("color: grey;\n" "font-size:13px;\n" "font-weight:bold;")
         self.label_12.setObjectName("label_12")
         self.label_13 = QtWidgets.QLabel(self.frame_9)
         self.label_13.setGeometry(QtCore.QRect(150, 30, 211, 16))
-        self.label_13.setStyleSheet("font-size:14px;\n"
-"color:grey;")
+        self.label_13.setStyleSheet("font-size:14px;\n" "color:grey;")
         self.label_13.setObjectName("label_13")
         self.label_14 = QtWidgets.QLabel(self.frame_9)
         self.label_14.setGeometry(QtCore.QRect(10, 50, 55, 21))
-        self.label_14.setStyleSheet("color: grey;\n"
-"font-size:12px;\n"
-"font-weight:bold;")
+        self.label_14.setStyleSheet("color: grey;\n" "font-size:12px;\n" "font-weight:bold;")
         self.label_14.setObjectName("label_14")
         self.label_15 = QtWidgets.QLabel(self.frame_9)
         self.label_15.setGeometry(QtCore.QRect(150, 50, 211, 16))
-        self.label_15.setStyleSheet("font-size:14px;\n"
-"color:grey;")
+        self.label_15.setStyleSheet("font-size:14px;\n" "color:grey;")
         self.label_15.setObjectName("label_15")
         self.frame_10 = QtWidgets.QFrame(self.Daily)
         self.frame_10.setGeometry(QtCore.QRect(10, 100, 351, 81))
@@ -128,22 +115,18 @@ class Ui_MainWindow(object):
         self.frame_10.setObjectName("frame_10")
         self.frame_11 = QtWidgets.QFrame(self.frame_10)
         self.frame_11.setGeometry(QtCore.QRect(10, 10, 61, 51))
-        self.frame_11.setStyleSheet("border-radius:10px;\n"
-"background-color: rgb(17, 181, 157);")
+        self.frame_11.setStyleSheet("border-radius:10px;\n" "background-color: rgb(17, 181, 157);")
         self.frame_11.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_11.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_11.setObjectName("frame_11")
         self.label_16 = QtWidgets.QLabel(self.frame_11)
         self.label_16.setGeometry(QtCore.QRect(0, 10, 61, 21))
-        self.label_16.setStyleSheet("font-weight:bold;\n"
-"color:white;\n"
-"")
+        self.label_16.setStyleSheet("font-weight:bold;\n" "color:white;\n" "")
         self.label_16.setAlignment(QtCore.Qt.AlignCenter)
         self.label_16.setObjectName("label_16")
         self.label_17 = QtWidgets.QLabel(self.frame_11)
         self.label_17.setGeometry(QtCore.QRect(4, 30, 51, 20))
-        self.label_17.setStyleSheet("color:white;\n"
-"font-size:12px;")
+        self.label_17.setStyleSheet("color:white;\n" "font-size:12px;")
         self.label_17.setAlignment(QtCore.Qt.AlignCenter)
         self.label_17.setObjectName("label_17")
         self.frame_12 = QtWidgets.QFrame(self.frame_10)
@@ -156,25 +139,19 @@ class Ui_MainWindow(object):
         self.label_18.setObjectName("label_18")
         self.label_19 = QtWidgets.QLabel(self.frame_12)
         self.label_19.setGeometry(QtCore.QRect(10, 30, 55, 21))
-        self.label_19.setStyleSheet("color: grey;\n"
-"font-size:13px;\n"
-"font-weight:bold;")
+        self.label_19.setStyleSheet("color: grey;\n" "font-size:13px;\n" "font-weight:bold;")
         self.label_19.setObjectName("label_19")
         self.label_20 = QtWidgets.QLabel(self.frame_12)
         self.label_20.setGeometry(QtCore.QRect(150, 30, 211, 16))
-        self.label_20.setStyleSheet("font-size:14px;\n"
-"color:grey;")
+        self.label_20.setStyleSheet("font-size:14px;\n" "color:grey;")
         self.label_20.setObjectName("label_20")
         self.label_21 = QtWidgets.QLabel(self.frame_12)
         self.label_21.setGeometry(QtCore.QRect(10, 50, 55, 21))
-        self.label_21.setStyleSheet("color: grey;\n"
-"font-size:12px;\n"
-"font-weight:bold;")
+        self.label_21.setStyleSheet("color: grey;\n" "font-size:12px;\n" "font-weight:bold;")
         self.label_21.setObjectName("label_21")
         self.label_22 = QtWidgets.QLabel(self.frame_12)
         self.label_22.setGeometry(QtCore.QRect(150, 50, 211, 16))
-        self.label_22.setStyleSheet("font-size:14px;\n"
-"color:grey;")
+        self.label_22.setStyleSheet("font-size:14px;\n" "color:grey;")
         self.label_22.setObjectName("label_22")
         self.frame_13 = QtWidgets.QFrame(self.Daily)
         self.frame_13.setGeometry(QtCore.QRect(10, 180, 351, 81))
@@ -183,22 +160,18 @@ class Ui_MainWindow(object):
         self.frame_13.setObjectName("frame_13")
         self.frame_14 = QtWidgets.QFrame(self.frame_13)
         self.frame_14.setGeometry(QtCore.QRect(10, 10, 61, 51))
-        self.frame_14.setStyleSheet("border-radius:10px;\n"
-"background-color: rgb(17, 181, 157);")
+        self.frame_14.setStyleSheet("border-radius:10px;\n" "background-color: rgb(17, 181, 157);")
         self.frame_14.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_14.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_14.setObjectName("frame_14")
         self.label_40 = QtWidgets.QLabel(self.frame_14)
         self.label_40.setGeometry(QtCore.QRect(0, 10, 61, 21))
-        self.label_40.setStyleSheet("font-weight:bold;\n"
-"color:white;\n"
-"")
+        self.label_40.setStyleSheet("font-weight:bold;\n"  "color:white;\n" "")
         self.label_40.setAlignment(QtCore.Qt.AlignCenter)
         self.label_40.setObjectName("label_40")
         self.label_41 = QtWidgets.QLabel(self.frame_14)
         self.label_41.setGeometry(QtCore.QRect(4, 30, 51, 20))
-        self.label_41.setStyleSheet("color:white;\n"
-"font-size:12px;")
+        self.label_41.setStyleSheet("color:white;\n" "font-size:12px;")
         self.label_41.setAlignment(QtCore.Qt.AlignCenter)
         self.label_41.setObjectName("label_41")
         self.frame_15 = QtWidgets.QFrame(self.frame_13)
@@ -211,25 +184,19 @@ class Ui_MainWindow(object):
         self.label_42.setObjectName("label_42")
         self.label_43 = QtWidgets.QLabel(self.frame_15)
         self.label_43.setGeometry(QtCore.QRect(10, 30, 55, 21))
-        self.label_43.setStyleSheet("color: grey;\n"
-"font-size:13px;\n"
-"font-weight:bold;")
+        self.label_43.setStyleSheet("color: grey;\n" "font-size:13px;\n" "font-weight:bold;")
         self.label_43.setObjectName("label_43")
         self.label_44 = QtWidgets.QLabel(self.frame_15)
         self.label_44.setGeometry(QtCore.QRect(150, 30, 211, 16))
-        self.label_44.setStyleSheet("font-size:14px;\n"
-"color:grey;")
+        self.label_44.setStyleSheet("font-size:14px;\n" "color:grey;")
         self.label_44.setObjectName("label_44")
         self.label_45 = QtWidgets.QLabel(self.frame_15)
         self.label_45.setGeometry(QtCore.QRect(10, 50, 55, 21))
-        self.label_45.setStyleSheet("color: grey;\n"
-"font-size:12px;\n"
-"font-weight:bold;")
+        self.label_45.setStyleSheet("color: grey;\n" "font-size:12px;\n" "font-weight:bold;")
         self.label_45.setObjectName("label_45")
         self.label_46 = QtWidgets.QLabel(self.frame_15)
         self.label_46.setGeometry(QtCore.QRect(150, 50, 211, 16))
-        self.label_46.setStyleSheet("font-size:14px;\n"
-"color:grey;")
+        self.label_46.setStyleSheet("font-size:14px;\n" "color:grey;")
         self.label_46.setObjectName("label_46")
         self.frame_16 = QtWidgets.QFrame(self.Daily)
         self.frame_16.setGeometry(QtCore.QRect(10, 260, 351, 81))
