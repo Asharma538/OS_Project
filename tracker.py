@@ -30,9 +30,9 @@ def monitor():
     with open("./apps_info/info.json") as old_app_pid_map_file:
         old_app_pid_map = json.loads(old_app_pid_map_file.read())
     
-    # print("Status right now:",end=" ")
-    # print(app_pid_map)
-    # print()
+    print("Status right now:",end=" ")
+    print(app_pid_map)
+    print()
 
     app_list = os.listdir("./apps/")
 
@@ -45,6 +45,10 @@ def monitor():
             # this app is already being monitored
             new_pid = app_pid_map[i]
             old_pid = old_app_pid_map[i]['pid']
+            
+            # if the app was closed and still closed -1 == -1
+            # if the app was running and still running with same PID go on....
+            # else : run -> closed,closed -> run
             
             if new_pid!=old_pid:
                 if new_pid==-1:
@@ -93,7 +97,7 @@ def monitor():
 
                     # as the app hasn't spawned any process as it is terminated we keep the pid as -1 and startTime empty
                     old_app_pid_map[i]['pid']=-1
-                    old_app_pid_map['startTime']=""
+                    old_app_pid_map[i]['startTime']=""
 
                 else:
                     # old pid is -1

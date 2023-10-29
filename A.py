@@ -8,6 +8,8 @@ from PyQt5.QtCore import Qt, QTimer,QRect
 from PyQt5.QtGui import QPainter, QBrush, QColor, QPen, QPixmap
 import math
 import sys,os
+import json
+import datetime
 
 class CircularProgressBar(QWidget): 
     def __init__(self, val=50, hrs=0, mins=0, parent=None):
@@ -155,6 +157,44 @@ class TimeTile(QWidget):
 
         self.setLayout(appTileLayout)
 
+def selectTopFive():
+
+    with open("./apps_info/app_map.json") as file :
+        # print(file.read())
+        apps = json.loads(file.read())
+
+    app_details = []
+
+    for _ in apps:
+        i = apps[_]
+        try:
+            totalTime = datetime.timedelta(seconds= 0)
+
+            with open("./apps/" + str(i) + "/" + str(datetime.datetime.now().date()) + ".txt") as f:
+                lines = f.readlines()
+
+                for line in lines:
+                    time = (line.split(' ')[2][:-1].split(':'))
+                    totalTime += datetime.timedelta(seconds=int(time[2]))
+                    totalTime += datetime.timedelta(minutes=int(time[1]))
+                    totalTime += datetime.timedelta(hours=int(time[0]))
+            # print( _ , i , str(totalTime) , len(lines))
+            app_details.append({
+                "Name": _,
+                "Usage" : str(totalTime),
+                "Visits": str(len(lines))
+            })
+
+        except:
+            # print(i + " wasn't opened today.")
+            continue
+
+    app_details = sorted(app_details , key = time_sort , reverse= True)
+    return app_details[:5]
+        
+def time_sort(t):
+    return (t["Usage"] , t["Visits"])
+
 def main():
     app = QApplication([])
     window = QWidget()
@@ -181,14 +221,7 @@ def main():
 
     col1.addWidget(dividingLineHorizontal)
 
-    topFiveList = [
-        { "Name":"Visual Studio Code", "Usage":"5 hrs 20 mins", "Visits": "2" },
-        { "Name":"Firefox", "Usage":"10 hrs 10 mins", "Visits": "5" },
-        { "Name":"Spotify", "Usage":"2 hrs 03 mins", "Visits": "1" },
-        { "Name":"Terminal", "Usage":"1 hrs 05 mins", "Visits": "4" },
-        { "Name":"System Monitor", "Usage":"0 hrs 30 mins", "Visits": "6" }
-    ]
-
+    topFiveList = selectTopFive()
     
     top5Section = QWidget()
     Grid = QGridLayout()
@@ -200,7 +233,6 @@ def main():
             top5Heading = QLabel("Top 5 Used Apps")
             top5Heading.setFont(QFont("Arial",16,500))
             top5Heading.setAlignment(Qt.AlignCenter)
-            # top5Heading.setStyleSheet("margin-bottom: 50px;\n")
             Grid.addWidget(top5Heading)
 
         Grid.setRowMinimumHeight(i,100)
