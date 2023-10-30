@@ -112,6 +112,8 @@ def monitor():
 
     with open("./apps_info/info.json","w") as old_app_pid_map_file:
         old_app_pid_map_file.write(json.dumps(old_app_pid_map,indent=4))
+
+    
     
 def get_idle_time():
     app_map = get_app_map()
@@ -140,10 +142,17 @@ def get_idle_time():
     Usage = str(occupiedTime//3600)+":"+str((occupiedTime%3600)//60)+":"+str(occupiedTime%60)
     return Usage
 
+def daily_update():
+    with open("./log/"+str(datetime.datetime.now().date())+".txt","w") as log_file:
+        log_file.write(get_idle_time())
+
 if __name__ == '__main__':
     timeout = 2
+    dailyTimeout = 60
 
     trackerObject = task.LoopingCall(monitor)
     trackerObject.start(timeout)
 
+    dailyUpdaterObject = task.LoopingCall(daily_update)
+    dailyUpdaterObject.start(dailyTimeout)
     reactor.run()

@@ -65,6 +65,8 @@ class CircularProgressBar(QWidget):
 
         painter.drawText(int(textX), int(textY), text)
 
+    # def updateProgressBar(self):
+
 class AppTile(QWidget):
     def __init__(self, name="<Name>",usage="0 hrs 0 mins", visits="0", parent=None):
         super().__init__(parent)
@@ -190,18 +192,22 @@ def selectTopFive():
             # print(i + " wasn't opened today.")
             continue
 
-    app_details = sorted(app_details , key = time_sort , reverse= True)
+    app_details = sorted(app_details , key = timeSort , reverse= True)
     return app_details[:5]
 
-def time_sort(t):
+def timeSort(t):
     hrs,mins,secs = t["Usage"].split(":")
     return ( int(hrs)*3600 + int(mins)*60 + int(secs) , int(t["Visits"]))
+
+def getUsageDetails():
+    with open("./log/"+str(datetime.datetime.now().date())+".txt") as log_file:
+        return log_file.readline()
 
 def main():
     app = QApplication([])
     window = QWidget()
     window.showMaximized()
-    window.setWindowTitle("My App")
+    window.setWindowTitle("App UpTime Tracker")
     window.setStyleSheet("background-color: rgb(239,242,249);\n")
 
     # main row is for containing the whole app's two sides
@@ -211,8 +217,7 @@ def main():
     col1 = QVBoxLayout()
     
     # For showing the total time spend in hrs & mins
-    hrsSpent, minsSpent = 6, 3
-
+    hrsSpent, minsSpent,secsSpent = map(int,getUsageDetails().split(":"))
     percentageTimeWidget = CircularProgressBar( math.ceil(((hrsSpent*60 + minsSpent)/1440)*100) ,hrsSpent,minsSpent)
 
     col1.addWidget(percentageTimeWidget)
@@ -234,7 +239,7 @@ def main():
         else:
             top5Heading = QLabel("No Apps used today")
             if len(topFiveList)!=0:
-                top5Heading = QLabel(f"Top {len(topFiveList)} Used Apps Today")
+                top5Heading = QLabel(f"Top Apps with the Highest Uptime Today")
             top5Heading.setFont(QFont("Arial",16,500))
             top5Heading.setAlignment(Qt.AlignCenter)
             Grid.addWidget(top5Heading)
@@ -320,9 +325,13 @@ def main():
 
     col2.addWidget(tabs)
 
-    rowMain.addLayout(col1,stretch=3)
+    col3 = QVBoxLayout()
+    col3.addWidget(QLabel("Third section"))
+
+    rowMain.addLayout(col1,stretch=1)
     rowMain.addWidget(dividingLine)
-    rowMain.addLayout(col2,stretch=4)
+    rowMain.addLayout(col2,stretch=1)
+    # rowMain.addLayout(col3,stretch=1)
 
     window.setLayout(rowMain)
 
