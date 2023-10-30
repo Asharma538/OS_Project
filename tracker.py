@@ -17,8 +17,12 @@ def get_running_apps_pids(apps):
     app_pid_map = {}
     for app in apps:
         pid = os.popen(f"pgrep -o {app}").read()
-        if pid:
-            app_pid_map[app] = int(pid)
+        if pid :
+            app_name = os.popen(f"ps -o comm= -p {pid}").readline()[:-1]
+            if app_name==app:
+                app_pid_map[app] = int(pid)
+            else:
+                app_pid_map[app] = -1
         else:
             app_pid_map[app] = -1
         
@@ -30,17 +34,18 @@ def monitor():
     with open("./apps_info/info.json") as old_app_pid_map_file:
         old_app_pid_map = json.loads(old_app_pid_map_file.read())
     
-    print("Status right now:",end=" ")
-    print(app_pid_map)
+    for i in app_pid_map:
+        print(i,app_pid_map[i],end=" | ")
     print()
-
-    app_list = os.listdir("./apps/")
-
+    
     for i in app_pid_map:
         if i not in old_app_pid_map:
-            # a new app is install, will have to see it
-            print(app_pid_map)
-            pass
+            # a new app is installed, will have to see it
+            os.mkdir("./apps/"+i)
+            old_app_pid_map[i] = {
+                "pid" : app_pid_map[i],
+                "startTime" : str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
+            }
         else:
             # this app is already being monitored
             new_pid = app_pid_map[i]
@@ -49,7 +54,7 @@ def monitor():
             # if the app was closed and still closed -1 == -1
             # if the app was running and still running with same PID go on....
             # else : run -> closed,closed -> run
-            
+
             if new_pid!=old_pid:
                 if new_pid==-1:
                     # new pid is -1
@@ -108,11 +113,37 @@ def monitor():
     with open("./apps_info/info.json","w") as old_app_pid_map_file:
         old_app_pid_map_file.write(json.dumps(old_app_pid_map,indent=4))
     
+def get_idle_time():
+    app_map = get_app_map()
+    
+    # clocks = datetime.datetime.now()
+    
+    # False -> idle , True -> Some app was running
+
+    timeStamps = [False for i in range(86400)]
+    
+    for i in app_map.values():
+        try:
+            with open("./apps/"+i+"/"+str(datetime.datetime.now().date())+".txt") as f:
+                lines = f.readlines()
+            for line in lines:
+                startTime,endTime,timeDuration = line.split()
+                
+                s = int(startTime[11:13])*3600 + int(startTime[14:16])*60 + int(startTime[17:19])
+                e = int(endTime[11:13])*3600 + int(endTime[14:16])*60 + int(endTime[17:19])
+                while s<e:
+                    timeStamps[s]=True
+                    s+=1
+        except:
+            continue
+    occupiedTime = timeStamps.count(True)
+    Usage = str(occupiedTime//3600)+":"+str((occupiedTime%3600)//60)+":"+str(occupiedTime%60)
+    return Usage
 
 if __name__ == '__main__':
     timeout = 2
 
-    # monitor()
-    l = task.LoopingCall(monitor)
-    l.start(timeout)
+    trackerObject = task.LoopingCall(monitor)
+    trackerObject.start(timeout)
+
     reactor.run()

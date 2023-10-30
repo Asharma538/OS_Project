@@ -4,5 +4,8 @@
     "System Monitor":"gnome-system-mo",
     "Calculator":"gnome-calculato",
     "Chrome":"chrome",
-    "Terminal":"gnome-terminal-"
+    "Terminal":"gnome-terminal-",
+    "Mozilla Firefox":"firefox",
+    "Htop":"htop",
+    "vim":"vim"
 }

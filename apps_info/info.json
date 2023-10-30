@@ -1,7 +1,7 @@
 {
     "code": {
-        "pid": 74796,
-        "startTime": "2023-10-29-14-10-17"
+        "pid": 96214,
+        "startTime": "2023-10-29-19-47-18"
     },
     "spotify": {
         "pid": -1,
@@ -12,8 +12,8 @@
         "startTime": ""
     },
     "chrome": {
-        "pid": 74813,
-        "startTime": "2023-10-29-14-10-17"
+        "pid": -1,
+        "startTime": ""
     },
     "gnome-calculato": {
         "pid": -1,
@@ -22,5 +22,17 @@
     "gnome-terminal-": {
         "pid": -1,
         "startTime": ""
+    },
+    "firefox": {
+        "pid": 160508,
+        "startTime": "2023-10-30-14-11-02"
+    },
+    "htop": {
+        "pid": -1,
+        "startTime": ""
+    },
+    "vim": {
+        "pid": -1,
+        "startTime": "2023-10-29-15-01-22"
     }
 }

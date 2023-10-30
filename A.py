@@ -18,6 +18,7 @@ class CircularProgressBar(QWidget):
         self.hrs = hrs
         self.mins = mins
         self.max_value = 100
+        self.setMinimumHeight(300)
 
     def paintEvent(self, event):
         painter = QPainter(self) # painting itself
@@ -25,7 +26,7 @@ class CircularProgressBar(QWidget):
 
         # (C,R)
         center = self.rect().center()
-        radius = int(min(self.width(), self.height()) / 3 - 10)
+        radius = int(min(self.width(), self.height()) / 2.5 - 10)
         
         start_angle = 90 * 16
         final_angle = int((self.value / self.max_value) * 360 * 16)
@@ -191,9 +192,10 @@ def selectTopFive():
 
     app_details = sorted(app_details , key = time_sort , reverse= True)
     return app_details[:5]
-        
+
 def time_sort(t):
-    return (t["Usage"] , t["Visits"])
+    hrs,mins,secs = t["Usage"].split(":")
+    return ( int(hrs)*3600 + int(mins)*60 + int(secs) , int(t["Visits"]))
 
 def main():
     app = QApplication([])
@@ -213,7 +215,7 @@ def main():
 
     percentageTimeWidget = CircularProgressBar( math.ceil(((hrsSpent*60 + minsSpent)/1440)*100) ,hrsSpent,minsSpent)
 
-    col1.addWidget(percentageTimeWidget,stretch=3)
+    col1.addWidget(percentageTimeWidget)
 
     dividingLineHorizontal = QWidget()
     dividingLineHorizontal.setFixedHeight(1)
@@ -226,11 +228,13 @@ def main():
     top5Section = QWidget()
     Grid = QGridLayout()
 
-    for i in range(6):
+    for i in range(1+len(topFiveList)):
         if i!=0:
             Grid.addWidget(AppTile(topFiveList[i-1]["Name"],topFiveList[i-1]["Usage"],topFiveList[i-1]["Visits"]))
         else:
-            top5Heading = QLabel("Top 5 Used Apps")
+            top5Heading = QLabel("No Apps used today")
+            if len(topFiveList)!=0:
+                top5Heading = QLabel(f"Top {len(topFiveList)} Used Apps Today")
             top5Heading.setFont(QFont("Arial",16,500))
             top5Heading.setAlignment(Qt.AlignCenter)
             Grid.addWidget(top5Heading)
@@ -241,7 +245,7 @@ def main():
     Grid.setContentsMargins(0,0,0,0)
     top5Section.setLayout(Grid)
 
-    col1.addWidget(top5Section,stretch=5)
+    col1.addWidget(top5Section)
 
 
     # for containing the right part of the application
@@ -264,7 +268,7 @@ def main():
     gridDaily = QGridLayout(dailyScrollAreaWidgetContents)
 
     for i in range(20):
-        gridDaily.addWidget(TimeTile("25","Oct","2023",topFiveList[i%5]["Usage"],topFiveList[i%5]["Visits"]))
+        gridDaily.addWidget(TimeTile("25","Oct","2023","00:00:00","0"))
     
     dailyScrollArea.setWidget(dailyScrollAreaWidgetContents)
     dailyLayout.addWidget(dailyScrollArea)
@@ -284,7 +288,7 @@ def main():
     gridWeekly = QGridLayout(weeklyScrollAreaWidgetContents)
 
     for i in range(20):
-        gridWeekly.addWidget(TimeTile("25","Oct","2023",topFiveList[i%5]["Usage"],topFiveList[i%5]["Visits"]))
+        gridWeekly.addWidget(TimeTile("25","Oct","2023","00:00:00","0"))
     
     weeklyScrollArea.setWidget(weeklyScrollAreaWidgetContents)
     weeklyLayout.addWidget(weeklyScrollArea)
@@ -304,7 +308,7 @@ def main():
     gridmonthly = QGridLayout(monthlyScrollAreaWidgetContents)
 
     for i in range(20):
-        gridmonthly.addWidget(TimeTile("25","Oct","2023",topFiveList[i%5]["Usage"],topFiveList[i%5]["Visits"]))
+        gridmonthly.addWidget(TimeTile("25","Oct","2023","00:00:00","0"))
     
     monthlyScrollArea.setWidget(monthlyScrollAreaWidgetContents)
     monthlyLayout.addWidget(monthlyScrollArea)
