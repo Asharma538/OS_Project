@@ -1,0 +1,38 @@
+{
+    "code": {
+        "pid": 96214,
+        "startTime": "2023-10-29-19-47-18"
+    },
+    "spotify": {
+        "pid": -1,
+        "startTime": ""
+    },
+    "gnome-system-mo": {
+        "pid": -1,
+        "startTime": ""
+    },
+    "chrome": {
+        "pid": -1,
+        "startTime": ""
+    },
+    "gnome-calculato": {
+        "pid": -1,
+        "startTime": ""
+    },
+    "gnome-terminal-": {
+        "pid": -1,
+        "startTime": ""
+    },
+    "firefox": {
+        "pid": 168044,
+        "startTime": "2023-10-30-15-06-56"
+    },
+    "htop": {
+        "pid": -1,
+        "startTime": ""
+    },
+    "vim": {
+        "pid": -1,
+        "startTime": "2023-10-29-15-01-22"
+    }
+}
