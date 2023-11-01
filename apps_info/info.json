@@ -1,11 +1,11 @@
 {
     "code": {
-        "pid": 96214,
-        "startTime": "2023-10-29-19-47-18"
+        "pid": 2294,
+        "startTime": "2023-10-31-05-24-47"
     },
     "spotify": {
-        "pid": -1,
-        "startTime": ""
+        "pid": 3903,
+        "startTime": "2023-10-31-06-07-42"
     },
     "gnome-system-mo": {
         "pid": -1,
@@ -16,16 +16,16 @@
         "startTime": ""
     },
     "gnome-calculato": {
-        "pid": -1,
-        "startTime": ""
+        "pid": 9109,
+        "startTime": "2023-10-31-06-07-42"
     },
     "gnome-terminal-": {
         "pid": -1,
         "startTime": ""
     },
     "firefox": {
-        "pid": 168044,
-        "startTime": "2023-10-30-15-06-56"
+        "pid": -1,
+        "startTime": ""
     },
     "htop": {
         "pid": -1,
