@@ -14,33 +14,44 @@ def get_all_windows():
     print(windows)
     dic = {}
     for window in windows:
-        print(window)
-        
+        # print(window)
+        window_info = os.popen(f"xprop -id {window}").read()
+        # print(window_info)
+
         # print(os.popen(f"xprop -id {window}").read().split("\n"))
 
         # print(os.popen(f"xprop -id {window} | grep -e 'WM_NAME(UTF8_STRING)'").readline()[:-1])
-        wm_name = os.popen(f"xprop -id {window} | grep -e 'WM_NAME(UTF8_STRING)'").readline()[:-1].split("=")[1][1:]
-        print(wm_name)
+        # print(wm_name)
         
         # print(os.popen(f"xprop -id {window} | grep -e '_NET_WM_PID(CARDINAL)'").readline()[:-1])
+        # print(wm_pid)
+
+        wm_name = os.popen(f"xprop -id {window} | grep -e 'WM_NAME(UTF8_STRING)'").readline()[:-1].split("=")[1][1:].split('-')[-1][1:-1]
         wm_pid = os.popen(f"xprop -id {window} | grep -e '_NET_WM_PID(CARDINAL)'").readline()[:-1].split("=")[1][1:]
-        print(wm_pid)
-
-        # print(os.popen(f"xprop -id {window} | grep -e 'WM_CLASS(STRING)'").readline()[:-1])
+        wm_state = os.popen(f"xprop -id {window} | grep -e '_NET_WM_STATE(ATOM)'").readline()[:-1].split("=")[1][1:]
         wm_class = os.popen(f"xprop -id {window} | grep -e 'WM_CLASS(STRING)'").readline()[:-1]
-        if wm_class == "":
-            print("No class\n\n")
-            dic[wm_name] = wm_pid
-            continue
-        else:
-            wm_class = wm_class.split("=")[1].split(",")[1][1:]
-            dic[wm_class] = wm_pid
-            print(wm_class)
 
-        # print(os.popen(f"xprop -id {window}").read().split("\n"))
-        print()
-        print()
+        is_on_screen = 0 if '_NET_WM_STATE_HIDDEN' in wm_state else 1
         
+        if wm_class:
+            if 'Gnome-' in wm_class:
+                dic[wm_name] = [wm_pid, is_on_screen]
+
+            else:
+                wm_class = wm_class.split(',')[1].strip()[1:-1]
+                dic[wm_class] = [wm_pid, is_on_screen]
+
+            
+        else:
+            is_on_screen = 0 if '_NET_WM_STATE_HIDDEN' in wm_state else 1
+            dic[wm_name] = [wm_pid, is_on_screen]
+
+
+        # print(f"{wm_name} | {wm_pid} | {wm_class} | {window} | {wm_state}")
+
+    # print()
+    # print("\n")
+    # print(dic)  
     return dic
 
 def monitor():
@@ -164,16 +175,19 @@ def monitor():
 #         log_file.write(get_idle_time())
 
 if __name__ == '__main__':
-    timeout = 2
+    timeout = 10
     dailyTimeout = 60
 
-    # trackerObject = task.LoopingCall(monitor)
-    # trackerObject.start(timeout)
+    trackerObject = task.LoopingCall(monitor)
+    trackerObject.start(timeout)
 
     # dailyUpdaterObject = task.LoopingCall(daily_update)
     # dailyUpdaterObject.start(dailyTimeout)
-    # reactor.run()
-    get_all_windows()
+
+    # trackerObject = task.LoopingCall(get_all_windows)
+    # trackerObject.start(timeout)
+    reactor.run()
+    # get_all_windows()
 
 
 
