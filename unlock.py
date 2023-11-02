@@ -5,6 +5,4 @@ def get_unlock_count(date):
     
     times_list = times.split("\n")[:-1]
 
-    return times_list
-
-print(get_unlock_count("Nov  1"))
+    return len(times_list)
