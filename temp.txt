@@ -45,4 +45,7 @@ if __name__ == '__main__':
     app=QApplication(sys.argv)
     form=WinForm()
     form.show()
-    sys.exit(app.exec_())
+--commands
+
+ls /usr/share/applications | awk -F '.desktop' ' { print $1}' -
+grep -i "Name=" /usr/share/applications/*.desktop # main 

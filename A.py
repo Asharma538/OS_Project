@@ -11,6 +11,22 @@ import sys,os
 import json
 import datetime
 
+month_dict = {
+    1:"Jan",
+    2:"Feb",
+    3:"Mar",
+    4:"Apr",
+    5:"May",
+    6:"Jun",
+    7:"Jul",
+    8:"Aug",
+    9:"Sep",
+    10:"Oct",
+    11:"Nov",
+    12:"Dec"
+}
+
+
 class CircularProgressBar(QWidget): 
     def __init__(self, val=50, hrs=0, mins=0, parent=None):
         super().__init__(parent)
@@ -76,6 +92,13 @@ class AppTile(QWidget):
         self.setFixedHeight(100)
         self.setStyleSheet("background-color : rgb(225,225,240);\n")
         self.make()
+        # self.updateTimerObj = QTimer()
+        # self.updateTimerObj.startTimer(10)
+        # self.updateTimerObj.timeout.connect(self.updateTimer)
+    
+    # def updateTimer():
+
+
 
     def make(self):
         appTileLayout = QHBoxLayout()
@@ -146,7 +169,7 @@ class TimeTile(QWidget):
         appProperties.setStyleSheet("border-radius: 10px;\n")
         appPropertiesLayout = QVBoxLayout()
         
-        appNameLabel = QLabel(str(self.date)+" "+str(self.month)+" "+str(self.year))
+        appNameLabel = QLabel(str(self.date)+" "+str(self.month)+", "+str(self.year))
         appUsageLabel = QLabel("Usage Time: "+self.usage)
         appVisitsLabel = QLabel("Unlocks: "+self.unlocks)
         appPropertiesLayout.addWidget(appNameLabel)
@@ -160,6 +183,139 @@ class TimeTile(QWidget):
 
         self.setLayout(appTileLayout)
 
+class WeeklyTimeTile(QWidget):
+    def __init__(self, weekNumber=1,avg_usage="00:00:00", avg_unlocks="0", parent=None):
+        super().__init__(parent)
+        self.weekNumber = weekNumber
+        self.suffix = self.get_week_suffix()
+        self.avg_usage = avg_usage
+        self.avg_unlocks = avg_unlocks
+        self.year = datetime.datetime.now().year
+
+        self.setFixedHeight(100)
+        self.setStyleSheet("background-color : rgb(225,225,240);\n")
+        self.make()
+
+    def get_week_suffix(self):
+        if (self.weekNumber%10==1): return "st"
+        elif (self.weekNumber%10==2): return "nd"
+        elif (self.weekNumber%10==3): return "rd"
+        return "th"
+
+    def make(self):
+        appTileLayout = QHBoxLayout()
+
+        weekFrame = QWidget()
+        weekFrame.setStyleSheet("border-radius:10;\n" "background-color:rgb(2,167,196);\n" "color:white;\n")
+        weekFrame.setFixedWidth(70)
+        weekFrame.setFixedHeight(70)
+
+        weekNumberBox = QLabel(str(self.weekNumber)+self.suffix,weekFrame)
+        weekNumberBox.setGeometry(QRect(15,0,40,40))
+        weekNumberBox.setAlignment(Qt.AlignCenter)
+
+        weekBox = QLabel("week",weekFrame)
+        weekBox.setGeometry(QRect(15,30,40,40))
+        weekBox.setAlignment(Qt.AlignCenter)
+        
+        timeProperties = QWidget()
+
+        timeProperties.setStyleSheet("border-radius: 10px;\n")
+        timePropertiesLayout = QVBoxLayout()
+        
+        weekLabel = QLabel("Week "+str(self.weekNumber)+", "+str(self.year))
+        avgUsageLabel = QLabel("Average Usage Time: "+self.avg_usage)
+        avgVisitsLabel = QLabel("Average Unlocks: "+self.avg_unlocks)
+        timePropertiesLayout.addWidget(weekLabel)
+        timePropertiesLayout.addWidget(avgUsageLabel)
+        timePropertiesLayout.addWidget(avgVisitsLabel)
+        
+        timeProperties.setLayout(timePropertiesLayout)
+
+        appTileLayout.addWidget(weekFrame)
+        appTileLayout.addWidget(timeProperties)
+
+        self.setLayout(appTileLayout)
+
+class MonthlyTimeTile(QWidget):
+    def __init__(self, monthName="Jan",avg_usage="00:00:00", avg_unlocks="0", parent=None):
+        super().__init__(parent)
+        self.monthName = monthName
+        self.avg_usage = avg_usage
+        self.avg_unlocks = avg_unlocks
+        self.year = datetime.datetime.now().year
+
+        self.setFixedHeight(100)
+        self.setStyleSheet("background-color : rgb(225,225,240);\n")
+        self.make()
+
+    def make(self):
+        monthTileLayout = QHBoxLayout()
+
+        monthFrame = QWidget()
+        monthFrame.setStyleSheet("border-radius:10;\n" "background-color:rgb(2,167,196);\n" "color:white;\n")
+        monthFrame.setFixedWidth(70)
+        monthFrame.setFixedHeight(70)
+
+        monthNameBox = QLabel(str(self.monthName),monthFrame)
+        monthNameBox.setGeometry(QRect(15,15,40,40))
+        monthNameBox.setAlignment(Qt.AlignCenter)
+        
+        timeProperties = QWidget()
+        timeProperties.setStyleSheet("border-radius: 10px;\n")
+        timePropertiesLayout = QVBoxLayout()
+        
+        weekLabel = QLabel(str(self.monthName)+" "+str(self.year))
+        avgUsageLabel = QLabel("Average Usage Time: "+self.avg_usage)
+        avgVisitsLabel = QLabel("Average Unlocks: "+self.avg_unlocks)
+        timePropertiesLayout.addWidget(weekLabel)
+        timePropertiesLayout.addWidget(avgUsageLabel)
+        timePropertiesLayout.addWidget(avgVisitsLabel)
+        
+        timeProperties.setLayout(timePropertiesLayout)
+
+        monthTileLayout.addWidget(monthFrame)
+        monthTileLayout.addWidget(timeProperties)
+
+        self.setLayout(monthTileLayout)
+
+
+def get_unlock_count(date):
+    times = os.popen(f"grep -e 'gdm-password]: pam_unix(gdm-password:session)' -e 'gdm-password]: gkr-pam: unlocked login keyring' /var/log/auth.log | grep -i '{date}' | cut -c 8-15").read()
+    times_list = times.split("\n")[:-1]
+    return len(times_list)
+
+class Top5Apps(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.timer = QTimer(self)
+        self.make()
+        self.timer.timeout.connect(self.make)
+        self.timer.start(1000)
+    
+    def make(self):
+        self.topFiveList = selectTopFive()
+        Grid = QGridLayout()
+        for i in range(1+len(self.topFiveList)):
+            if i!=0:
+                Grid.addWidget(AppTile(self.topFiveList[i-1]["Name"],self.topFiveList[i-1]["Usage"],self.topFiveList[i-1]["Visits"]))
+            else:
+                top5Heading = QLabel("No Apps used today")
+                if len(self.topFiveList)!=0:
+                    top5Heading = QLabel(f"Top Apps with the Highest Uptime Today")
+                top5Heading.setFont(QFont("Arial",16,500))
+                top5Heading.setAlignment(Qt.AlignCenter)
+                Grid.addWidget(top5Heading)
+
+            Grid.setRowMinimumHeight(i,100)
+
+        Grid.setSpacing(0)
+        Grid.setContentsMargins(0,0,0,0)
+        self.grid = Grid
+        if self.layout() is not None:
+            self.layout().deleteLater()
+        self.setLayout(self.grid)
+
 def selectTopFive():
 
     with open("./apps_info/app_map.json") as file :
@@ -167,6 +323,10 @@ def selectTopFive():
         apps = json.loads(file.read())
 
     app_details = []
+
+    with open("./apps_info/info.json") as f:
+        app_info = json.loads(f.read())
+    # print(app_info)
 
     for _ in apps:
         i = apps[_]
@@ -181,17 +341,31 @@ def selectTopFive():
                     totalTime += datetime.timedelta(seconds=int(time[2]))
                     totalTime += datetime.timedelta(minutes=int(time[1]))
                     totalTime += datetime.timedelta(hours=int(time[0]))
+            
+            
             # print( _ , i , str(totalTime) , len(lines))
+
+            
+            visits = len(lines)
+
+            if(app_info[i]["pid"] != -1):
+                totalTime += datetime.datetime.strptime(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"),"%Y-%m-%d-%H-%M-%S") - datetime.datetime.strptime(app_info[i]["startTime"] , "%Y-%m-%d-%H-%M-%S")
+                visits += 1
             app_details.append({
                 "Name": _,
                 "Usage" : str(totalTime),
-                "Visits": str(len(lines))
+                "Visits": str(visits)
             })
 
-        except:
-            # print(i + " wasn't opened today.")
-            continue
+        except Exception as e:
+            if(app_info[i]["pid"] != -1):
+                app_details.append({
+                    "Name": _,
+                    "Usage" : str(datetime.datetime.strptime(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"),"%Y-%m-%d-%H-%M-%S") - datetime.datetime.strptime(app_info[i]["startTime"] , "%Y-%m-%d-%H-%M-%S")),
+                    "Visits": "1"
+                })
 
+    # print(app_details)
     app_details = sorted(app_details , key = timeSort , reverse= True)
     return app_details[:5]
 
@@ -216,8 +390,8 @@ def main():
     # for containing the left part of the application
     col1 = QVBoxLayout()
     
-    # For showing the total time spend in hrs & mins
-    hrsSpent, minsSpent,secsSpent = map(int,getUsageDetails().split(":"))
+
+    hrsSpent, minsSpent,secsSpent = 5 , 10 , 0
     percentageTimeWidget = CircularProgressBar( math.ceil(((hrsSpent*60 + minsSpent)/1440)*100) ,hrsSpent,minsSpent)
 
     col1.addWidget(percentageTimeWidget)
@@ -228,30 +402,8 @@ def main():
 
     col1.addWidget(dividingLineHorizontal)
 
-    topFiveList = selectTopFive()
-    
-    top5Section = QWidget()
-    Grid = QGridLayout()
-
-    for i in range(1+len(topFiveList)):
-        if i!=0:
-            Grid.addWidget(AppTile(topFiveList[i-1]["Name"],topFiveList[i-1]["Usage"],topFiveList[i-1]["Visits"]))
-        else:
-            top5Heading = QLabel("No Apps used today")
-            if len(topFiveList)!=0:
-                top5Heading = QLabel(f"Top Apps with the Highest Uptime Today")
-            top5Heading.setFont(QFont("Arial",16,500))
-            top5Heading.setAlignment(Qt.AlignCenter)
-            Grid.addWidget(top5Heading)
-
-        Grid.setRowMinimumHeight(i,100)
-
-    Grid.setSpacing(0)
-    Grid.setContentsMargins(0,0,0,0)
-    top5Section.setLayout(Grid)
-
-    col1.addWidget(top5Section)
-
+    top5widget = Top5Apps()
+    col1.addWidget(top5widget)
 
     # for containing the right part of the application
     dividingLine = QWidget()
@@ -272,9 +424,18 @@ def main():
     dailyScrollAreaWidgetContents = QWidget()
     gridDaily = QGridLayout(dailyScrollAreaWidgetContents)
 
-    for i in range(20):
-        gridDaily.addWidget(TimeTile("25","Oct","2023","00:00:00","0"))
+    with open("./daily_usage.json") as file :
+        dailyUsageDetails = json.loads(file.read())
+
+    # print(dailyUsageDetails)
+
+    for i in (dailyUsageDetails):
+        dailyYear , dailyMonth , dailyDate = list(map(str , i.split('-')))
+        
+        print(dailyUsageDetails[i][0] , dailyUsageDetails[i][1])
+        gridDaily.addWidget(TimeTile(dailyDate, month_dict[int(dailyMonth)] ,dailyYear, dailyUsageDetails[i][0] , str(dailyUsageDetails[i][1])))
     
+    gridDaily.setAlignment(Qt.AlignmentFlag.AlignTop)
     dailyScrollArea.setWidget(dailyScrollAreaWidgetContents)
     dailyLayout.addWidget(dailyScrollArea)
 
@@ -293,8 +454,10 @@ def main():
     gridWeekly = QGridLayout(weeklyScrollAreaWidgetContents)
 
     for i in range(20):
-        gridWeekly.addWidget(TimeTile("25","Oct","2023","00:00:00","0"))
+        gridWeekly.addWidget(WeeklyTimeTile(2 ,"00:00:00","0"))
     
+    gridWeekly.setAlignment(Qt.AlignmentFlag.AlignTop)
+
     weeklyScrollArea.setWidget(weeklyScrollAreaWidgetContents)
     weeklyLayout.addWidget(weeklyScrollArea)
 
@@ -313,8 +476,10 @@ def main():
     gridmonthly = QGridLayout(monthlyScrollAreaWidgetContents)
 
     for i in range(20):
-        gridmonthly.addWidget(TimeTile("25","Oct","2023","00:00:00","0"))
+        gridmonthly.addWidget(MonthlyTimeTile("Oct","00:00:00","0"))
     
+    gridmonthly.setAlignment(Qt.AlignmentFlag.AlignTop)
+
     monthlyScrollArea.setWidget(monthlyScrollAreaWidgetContents)
     monthlyLayout.addWidget(monthlyScrollArea)
 
@@ -340,3 +505,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    # selectTopFive()

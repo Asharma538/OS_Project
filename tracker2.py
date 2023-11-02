@@ -5,47 +5,60 @@ import time
 from twisted.internet import task,reactor
 import datetime
 
-# global variables
-month_dict = {
-    1:"Jan",
-    2:"Feb",
-    3:"Mar",
-    4:"Apr",
-    5:"May",
-    6:"Jun",
-    7:"Jul",
-    8:"Aug",
-    9:"Sep",
-    10:"Oct",
-    11:"Nov",
-    12:"Dec"
-}
 
-def get_app_map():
-    app_map = {}
-    with open("./apps_info/app_map.json") as app_map_file:
-        app_map = json.loads(app_map_file.read())
+def get_all_windows():
+    windows = os.popen("xprop -root | grep '_NET_CLIENT_LIST_STACKING(WINDOW)'").read()
+    windows = windows.split(" ")
+    windows = [window[:-1] for window in windows if "0x" in window]
+    # windows = [window[:-1] for window in windows]
+    print(windows)
+    dic = {}
+    for window in windows:
+        # print(window)
+        window_info = os.popen(f"xprop -id {window}").read()
+        # print(window_info)
 
-    return app_map
+        # print(os.popen(f"xprop -id {window}").read().split("\n"))
 
-def get_running_apps_pids(apps):
-    app_pid_map = {}
-    for app in apps:
-        pid = os.popen(f"pgrep -o {app}").read()
-        if pid :
-            app_name = os.popen(f"ps -o comm= -p {pid}").readline()[:-1]
-            if app_name==app:
-                app_pid_map[app] = int(pid)
-            else:
-                app_pid_map[app] = -1
-        else:
-            app_pid_map[app] = -1
+        # print(os.popen(f"xprop -id {window} | grep -e 'WM_NAME(UTF8_STRING)'").readline()[:-1])
+        # print(wm_name)
         
-    return app_pid_map
+        # print(os.popen(f"xprop -id {window} | grep -e '_NET_WM_PID(CARDINAL)'").readline()[:-1])
+        # print(wm_pid)
+
+        wm_name = os.popen(f"xprop -id {window} | grep -e 'WM_NAME(UTF8_STRING)'").readline()[:-1].split("=")[1][1:].split('-')[-1][1:-1]
+        wm_pid = os.popen(f"xprop -id {window} | grep -e '_NET_WM_PID(CARDINAL)'").readline()[:-1].split("=")[1][1:]
+        wm_state = os.popen(f"xprop -id {window} | grep -e '_NET_WM_STATE(ATOM)'").readline()[:-1].split("=")[1][1:]
+        wm_class = os.popen(f"xprop -id {window} | grep -e 'WM_CLASS(STRING)'").readline()[:-1]
+
+        is_on_screen = 0 if '_NET_WM_STATE_HIDDEN' in wm_state else 1
+        
+        if wm_class:
+            if 'Gnome-' in wm_class:
+                dic[wm_name] = [wm_pid, is_on_screen]
+
+            else:
+                wm_class = wm_class.split(',')[1].strip()[1:-1]
+                dic[wm_class] = [wm_pid, is_on_screen]
+
+            
+        else:
+            is_on_screen = 0 if '_NET_WM_STATE_HIDDEN' in wm_state else 1
+            dic[wm_name] = [wm_pid, is_on_screen]
+
+
+        print(f"{wm_name} | {wm_pid} | {wm_class} | {window} | {wm_state}")
+
+    print()
+    # print("\n")
+    # print(dic)  
+    return dic
 
 def monitor():
-    app_map = get_app_map()
-    app_pid_map = get_running_apps_pids(app_map.values())
+    # app_map = get_app_map()
+    # app_pid_map = get_running_apps_pids(app_map.values())
+    app_pid_map = get_all_windows()
+    print(app_pid_map)
     with open("./apps_info/info.json") as old_app_pid_map_file:
         old_app_pid_map = json.loads(old_app_pid_map_file.read())
     
@@ -128,71 +141,57 @@ def monitor():
     with open("./apps_info/info.json","w") as old_app_pid_map_file:
         old_app_pid_map_file.write(json.dumps(old_app_pid_map,indent=4))
 
-
-def get_unlock_count(date):
-    times = os.popen(f"grep -e 'gdm-password]: pam_unix(gdm-password:session)' -e 'gdm-password]: gkr-pam: unlocked login keyring' /var/log/auth.log | grep -i '{date}' | cut -c 8-15").read()
-    times_list = times.split("\n")[:-1]
-    return len(times_list)
-
-def daily_tab_monitor():
     
-    daily_dict={}
-
-    try:
-        with open("./daily_usage.json") as file:
-            daily_dict = json.loads(file.read()) 
-    except:
-        daily_dict = {} # creating the log file
-
     
-    day_today = ""
-    if len(str(datetime.datetime.now().date().day))==1 : day_today = " "+str(datetime.datetime.now().date().day)
-    else : day_today = str(datetime.datetime.now().date().day)
+# def get_idle_time():
+#     app_map = get_app_map()
     
-
-    month_str = (month_dict[datetime.datetime.now().date().month])
-
-    date_format = month_str + " " + day_today
-    daily_dict[str(datetime.datetime.now().date())] = ["00:00:00" , get_unlock_count(date_format)]
+#     # clocks = datetime.datetime.now()
     
-    with open("./daily_usage.json","w+") as file:
-        file.write(json.dumps(daily_dict))
+#     # False -> idle , True -> Some app was running
 
-
-def get_idle_time():
-    app_map = get_app_map()
+#     timeStamps = [False for i in range(86400)]
     
-    # clocks = datetime.datetime.now()
-    
-    # False -> idle , True -> Some app was running
-
-    timeStamps = [False for i in range(86400)]
-    
-    for i in app_map.values():
-        try:
-            with open("./apps/"+i+"/"+str(datetime.datetime.now().date())+".txt") as f:
-                lines = f.readlines()
-            for line in lines:
-                startTime,endTime,timeDuration = line.split()
+#     for i in app_map.values():
+#         try:
+#             with open("./apps/"+i+"/"+str(datetime.datetime.now().date())+".txt") as f:
+#                 lines = f.readlines()
+#             for line in lines:
+#                 startTime,endTime,timeDuration = line.split()
                 
-                s = int(startTime[11:13])*3600 + int(startTime[14:16])*60 + int(startTime[17:19])
-                e = int(endTime[11:13])*3600 + int(endTime[14:16])*60 + int(endTime[17:19])
-                while s<e:
-                    timeStamps[s]=True
-                    s+=1
-        except:
-            continue
-    occupiedTime = timeStamps.count(True)
-    Usage = str(occupiedTime//3600)+":"+str((occupiedTime%3600)//60)+":"+str(occupiedTime%60)
-    return Usage
+#                 s = int(startTime[11:13])*3600 + int(startTime[14:16])*60 + int(startTime[17:19])
+#                 e = int(endTime[11:13])*3600 + int(endTime[14:16])*60 + int(endTime[17:19])
+#                 while s<e:
+#                     timeStamps[s]=True
+#                     s+=1
+#         except:
+#             continue
+#     occupiedTime = timeStamps.count(True)
+#     Usage = str(occupiedTime//3600)+":"+str((occupiedTime%3600)//60)+":"+str(occupiedTime%60)
+#     return Usage
 
+# def daily_update():
+#     with open("./log/"+str(datetime.datetime.now().date())+".txt","w") as log_file:
+#         log_file.write(get_idle_time())
 
 if __name__ == '__main__':
-    timeout = 2
+    timeout = 10
     dailyTimeout = 60
 
-    daily_tab_monitor()
     # trackerObject = task.LoopingCall(monitor)
     # trackerObject.start(timeout)
 
-    # reactor.run()
+    # dailyUpdaterObject = task.LoopingCall(daily_update)
+    # dailyUpdaterObject.start(dailyTimeout)
+
+    trackerObject = task.LoopingCall(get_all_windows)
+    trackerObject.start(timeout)
+    reactor.run()
+    # get_all_windows()
+
+
+
+# WM_NAME(UTF8_STRING)
+# WM_CLASS(STRING)
+# _NET_WM_PID(CARDINAL)
+# WM_CLASS(STRING) = "evince
