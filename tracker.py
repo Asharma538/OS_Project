@@ -5,6 +5,21 @@ import time
 from twisted.internet import task,reactor
 import datetime
 
+# global variables
+month_dict = {
+    1:"Jan",
+    2:"Feb",
+    3:"Mar",
+    4:"Apr",
+    5:"May",
+    6:"Jun",
+    7:"Jul",
+    8:"Aug",
+    9:"Sep",
+    10:"Oct",
+    11:"Nov",
+    12:"Dec"
+}
 
 def get_app_map():
     app_map = {}
@@ -113,8 +128,37 @@ def monitor():
     with open("./apps_info/info.json","w") as old_app_pid_map_file:
         old_app_pid_map_file.write(json.dumps(old_app_pid_map,indent=4))
 
+
+def get_unlock_count(date):
+    times = os.popen(f"grep -e 'gdm-password]: pam_unix(gdm-password:session)' -e 'gdm-password]: gkr-pam: unlocked login keyring' /var/log/auth.log | grep -i '{date}' | cut -c 8-15").read()
+    times_list = times.split("\n")[:-1]
+    return len(times_list)
+
+def daily_tab_monitor():
     
+    daily_dict={}
+
+    try:
+        with open("./daily_usage.json") as file:
+            daily_dict = json.loads(file.read()) 
+    except:
+        daily_dict = {} # creating the log file
+
     
+    day_today = ""
+    if len(str(datetime.datetime.now().date().day))==1 : day_today = " "+str(datetime.datetime.now().date().day)
+    else : day_today = str(datetime.datetime.now().date().day)
+    
+
+    month_str = (month_dict[datetime.datetime.now().date().month])
+
+    date_format = month_str + " " + day_today
+    daily_dict[str(datetime.datetime.now().date())] = ["00:00:00" , get_unlock_count(date_format)]
+    
+    with open("./daily_usage.json","w+") as file:
+        file.write(json.dumps(daily_dict))
+
+
 def get_idle_time():
     app_map = get_app_map()
     
@@ -142,17 +186,13 @@ def get_idle_time():
     Usage = str(occupiedTime//3600)+":"+str((occupiedTime%3600)//60)+":"+str(occupiedTime%60)
     return Usage
 
-def daily_update():
-    with open("./log/"+str(datetime.datetime.now().date())+".txt","w") as log_file:
-        log_file.write(get_idle_time())
 
 if __name__ == '__main__':
     timeout = 2
     dailyTimeout = 60
 
-    trackerObject = task.LoopingCall(monitor)
-    trackerObject.start(timeout)
+    daily_tab_monitor()
+    # trackerObject = task.LoopingCall(monitor)
+    # trackerObject.start(timeout)
 
-    dailyUpdaterObject = task.LoopingCall(daily_update)
-    dailyUpdaterObject.start(dailyTimeout)
-    reactor.run()
+    # reactor.run()
