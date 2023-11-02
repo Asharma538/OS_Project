@@ -4,8 +4,8 @@
         "startTime": "2023-11-01-15-49-07"
     },
     "spotify": {
-        "pid": -1,
-        "startTime": ""
+        "pid": 3903,
+        "startTime": "2023-10-31-06-07-42"
     },
     "gnome-system-mo": {
         "pid": -1,
@@ -16,8 +16,8 @@
         "startTime": ""
     },
     "gnome-calculato": {
-        "pid": -1,
-        "startTime": ""
+        "pid": 9109,
+        "startTime": "2023-10-31-06-07-42"
     },
     "gnome-terminal-": {
         "pid": -1,
@@ -34,5 +34,68 @@
     "vim": {
         "pid": -1,
         "startTime": "2023-10-29-15-01-22"
+    },
+    "Evince": {
+        "pid": [
+            "15056",
+            1
+        ],
+        "startTime": "2023-11-01-19-43-28"
+    },
+    "Google-chrome": {
+        "pid": [
+            "17342",
+            0
+        ],
+        "startTime": "2023-11-01-19-43-28"
+    },
+    "Spotify": {
+        "pid": [
+            "14814",
+            0
+        ],
+        "startTime": "2023-11-01-19-43-28"
+    },
+    "Calculator": {
+        "pid": [
+            "37610",
+            1
+        ],
+        "startTime": "2023-11-01-19-43-28"
+    },
+    "GitHub Desktop": {
+        "pid": [
+            "38808",
+            1
+        ],
+        "startTime": "2023-11-01-19-43-28"
+    },
+    "Org.gnome.Nautilus": {
+        "pid": [
+            "41846",
+            1
+        ],
+        "startTime": "2023-11-01-19-43-28"
+    },
+    "Brave-browser": {
+        "pid": [
+            "38930",
+            1
+        ],
+        "startTime": "2023-11-01-19-43-28"
+    },
+    "Eog": {
+        "pid": [
+            "41958",
+            1
+        ],
+        "startTime": "2023-11-01-19-43-28"
+    },
+    "Code": {
+        "pid": [
+            "3158",
+            1
+        ],
+        "startTime": "2023-11-01-19-43-28"
     }
 }
