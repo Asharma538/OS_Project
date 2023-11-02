@@ -11,6 +11,7 @@ import sys,os
 import json
 import datetime
 
+# global variable
 month_dict = {
     1:"Jan",
     2:"Feb",
@@ -83,6 +84,7 @@ class CircularProgressBar(QWidget):
 
     # def updateProgressBar(self):
 
+
 class AppTile(QWidget):
     def __init__(self, name="<Name>",usage="0 hrs 0 mins", visits="0", parent=None):
         super().__init__(parent)
@@ -136,6 +138,7 @@ class AppTile(QWidget):
 
         self.setLayout(appTileLayout)
 
+
 class TimeTile(QWidget):
     def __init__(self, date="01",month="01",year="01",usage="0 hrs 0 mins", unlocks="0", parent=None):
         super().__init__(parent)
@@ -182,6 +185,7 @@ class TimeTile(QWidget):
         appTileLayout.addWidget(appProperties)
 
         self.setLayout(appTileLayout)
+
 
 class WeeklyTimeTile(QWidget):
     def __init__(self, weekNumber=1,avg_usage="00:00:00", avg_unlocks="0", parent=None):
@@ -237,6 +241,7 @@ class WeeklyTimeTile(QWidget):
 
         self.setLayout(appTileLayout)
 
+
 class MonthlyTimeTile(QWidget):
     def __init__(self, monthName="Jan",avg_usage="00:00:00", avg_unlocks="0", parent=None):
         super().__init__(parent)
@@ -280,11 +285,6 @@ class MonthlyTimeTile(QWidget):
         self.setLayout(monthTileLayout)
 
 
-def get_unlock_count(date):
-    times = os.popen(f"grep -e 'gdm-password]: pam_unix(gdm-password:session)' -e 'gdm-password]: gkr-pam: unlocked login keyring' /var/log/auth.log | grep -i '{date}' | cut -c 8-15").read()
-    times_list = times.split("\n")[:-1]
-    return len(times_list)
-
 class Top5Apps(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -316,24 +316,27 @@ class Top5Apps(QWidget):
             self.layout().deleteLater()
         self.setLayout(self.grid)
 
-def selectTopFive():
 
-    with open("./apps_info/app_map.json") as file :
-        # print(file.read())
-        apps = json.loads(file.read())
+def get_unlock_count(date):
+    times = os.popen(f"grep -e 'gdm-password]: pam_unix(gdm-password:session)' -e 'gdm-password]: gkr-pam: unlocked login keyring' /var/log/auth.log | grep -i '{date}' | cut -c 8-15").read()
+    times_list = times.split("\n")[:-1]
+    return len(times_list)
+
+
+def selectTopFive():
 
     app_details = []
 
     with open("./apps_info/info.json") as f:
         app_info = json.loads(f.read())
-    # print(app_info)
+    print(app_info)
 
-    for _ in apps:
-        i = apps[_]
+    app_names = os.listdir('./apps/')
+    for _ in app_names:
         try:
             totalTime = datetime.timedelta(seconds= 0)
 
-            with open("./apps/" + str(i) + "/" + str(datetime.datetime.now().date()) + ".txt") as f:
+            with open("./apps/" + str(_) + "/" + str(datetime.datetime.now().date()) + ".txt") as f:
                 lines = f.readlines()
 
                 for line in lines:
@@ -341,15 +344,11 @@ def selectTopFive():
                     totalTime += datetime.timedelta(seconds=int(time[2]))
                     totalTime += datetime.timedelta(minutes=int(time[1]))
                     totalTime += datetime.timedelta(hours=int(time[0]))
-            
-            
-            # print( _ , i , str(totalTime) , len(lines))
 
-            
             visits = len(lines)
 
-            if(app_info[i]["pid"] != -1):
-                totalTime += datetime.datetime.strptime(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"),"%Y-%m-%d-%H-%M-%S") - datetime.datetime.strptime(app_info[i]["startTime"] , "%Y-%m-%d-%H-%M-%S")
+            if _ in app_info:
+                totalTime += datetime.datetime.strptime(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"),"%Y-%m-%d-%H-%M-%S") - datetime.datetime.strptime(app_info[_]["startTime"] , "%Y-%m-%d-%H-%M-%S")
                 visits += 1
             app_details.append({
                 "Name": _,
@@ -358,24 +357,22 @@ def selectTopFive():
             })
 
         except Exception as e:
-            if(app_info[i]["pid"] != -1):
+            if _ in app_info:
                 app_details.append({
                     "Name": _,
-                    "Usage" : str(datetime.datetime.strptime(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"),"%Y-%m-%d-%H-%M-%S") - datetime.datetime.strptime(app_info[i]["startTime"] , "%Y-%m-%d-%H-%M-%S")),
+                    "Usage" : str(datetime.datetime.strptime(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"),"%Y-%m-%d-%H-%M-%S") - datetime.datetime.strptime(app_info[_]["startTime"] , "%Y-%m-%d-%H-%M-%S")),
                     "Visits": "1"
                 })
 
-    # print(app_details)
+    print(app_details)
     app_details = sorted(app_details , key = timeSort , reverse= True)
     return app_details[:5]
+
 
 def timeSort(t):
     hrs,mins,secs = t["Usage"].split(":")
     return ( int(hrs)*3600 + int(mins)*60 + int(secs) , int(t["Visits"]))
 
-def getUsageDetails():
-    with open("./log/"+str(datetime.datetime.now().date())+".txt") as log_file:
-        return log_file.readline()
 
 def main():
     app = QApplication([])
@@ -496,12 +493,12 @@ def main():
     rowMain.addLayout(col1,stretch=1)
     rowMain.addWidget(dividingLine)
     rowMain.addLayout(col2,stretch=1)
-    # rowMain.addLayout(col3,stretch=1)
 
     window.setLayout(rowMain)
 
     window.show()
     app.exec_()
+
 
 if __name__ == '__main__':
     main()

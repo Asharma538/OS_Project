@@ -1,101 +1,12 @@
 {
-    "code": {
-        "pid": 9175,
-        "startTime": "2023-11-01-15-49-07"
+    "Visual Studio Code": {
+        "pid": 7280,
+        "startTime": "2023-11-02-20-31-55",
+        "maximized": 1
     },
-    "spotify": {
-        "pid": 3903,
-        "startTime": "2023-10-31-06-07-42"
-    },
-    "gnome-system-mo": {
-        "pid": -1,
-        "startTime": ""
-    },
-    "chrome": {
-        "pid": -1,
-        "startTime": ""
-    },
-    "gnome-calculato": {
-        "pid": 9109,
-        "startTime": "2023-10-31-06-07-42"
-    },
-    "gnome-terminal-": {
-        "pid": -1,
-        "startTime": ""
-    },
-    "firefox": {
-        "pid": 11678,
-        "startTime": "2023-11-01-15-49-07"
-    },
-    "htop": {
-        "pid": -1,
-        "startTime": ""
-    },
-    "vim": {
-        "pid": -1,
-        "startTime": "2023-10-29-15-01-22"
-    },
-    "Evince": {
-        "pid": [
-            "15056",
-            1
-        ],
-        "startTime": "2023-11-01-19-43-28"
-    },
-    "Google-chrome": {
-        "pid": [
-            "17342",
-            0
-        ],
-        "startTime": "2023-11-01-19-43-28"
-    },
-    "Spotify": {
-        "pid": [
-            "14814",
-            0
-        ],
-        "startTime": "2023-11-01-19-43-28"
-    },
-    "Calculator": {
-        "pid": [
-            "37610",
-            1
-        ],
-        "startTime": "2023-11-01-19-43-28"
-    },
-    "GitHub Desktop": {
-        "pid": [
-            "38808",
-            1
-        ],
-        "startTime": "2023-11-01-19-43-28"
-    },
-    "Org.gnome.Nautilus": {
-        "pid": [
-            "41846",
-            1
-        ],
-        "startTime": "2023-11-01-19-43-28"
-    },
-    "Brave-browser": {
-        "pid": [
-            "38930",
-            1
-        ],
-        "startTime": "2023-11-01-19-43-28"
-    },
-    "Eog": {
-        "pid": [
-            "41958",
-            1
-        ],
-        "startTime": "2023-11-01-19-43-28"
-    },
-    "Code": {
-        "pid": [
-            "3158",
-            1
-        ],
-        "startTime": "2023-11-01-19-43-28"
+    "Firefox Web Browser": {
+        "pid": 117253,
+        "startTime": "2023-11-02-21-38-18",
+        "maximized": 1
     }
 }

@@ -94,8 +94,6 @@ def get_snap_app_list():
     return final_apps
 
 
-
-
 def get_all_windows():
 
     listofapps = get_sudo_app_list()
@@ -140,14 +138,7 @@ def get_all_windows():
 
 
 if __name__ == "__main__":
-    # get_sudo_app_list()
     timeout = 2
-    dailyTimeout = 60
-
-
     trackerObject = task.LoopingCall(get_all_windows)
     trackerObject.start(timeout)
     reactor.run()
-
-    # get_all_windows()
-    # get_snap_app_list()
