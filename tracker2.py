@@ -47,9 +47,9 @@ def get_all_windows():
             dic[wm_name] = [wm_pid, is_on_screen]
 
 
-        # print(f"{wm_name} | {wm_pid} | {wm_class} | {window} | {wm_state}")
+        print(f"{wm_name} | {wm_pid} | {wm_class} | {window} | {wm_state}")
 
-    # print()
+    print()
     # print("\n")
     # print(dic)  
     return dic
@@ -178,14 +178,14 @@ if __name__ == '__main__':
     timeout = 10
     dailyTimeout = 60
 
-    trackerObject = task.LoopingCall(monitor)
-    trackerObject.start(timeout)
+    # trackerObject = task.LoopingCall(monitor)
+    # trackerObject.start(timeout)
 
     # dailyUpdaterObject = task.LoopingCall(daily_update)
     # dailyUpdaterObject.start(dailyTimeout)
 
-    # trackerObject = task.LoopingCall(get_all_windows)
-    # trackerObject.start(timeout)
+    trackerObject = task.LoopingCall(get_all_windows)
+    trackerObject.start(timeout)
     reactor.run()
     # get_all_windows()
 
