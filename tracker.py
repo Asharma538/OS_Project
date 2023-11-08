@@ -146,7 +146,6 @@ def get_all_windows():
                 dic[app[1]] = [int(wm_pid), is_on_screen]
                 break
     
-    print(dic)
     return dic
 
 # monitors the apps, updates the app directories which store all data
@@ -160,7 +159,7 @@ def monitor():
     app_pid_map = get_all_windows()
     
     for i in app_pid_map:
-        print(i,app_pid_map[i],end=" | ")
+        print(i,app_pid_map[i][0],end=" | ")
     print()
 
 
@@ -234,9 +233,51 @@ def get_unlock_count(date):
     times_list = times.split("\n")[:-1]
     return len(times_list)
 
+def get_uptime(date):
+    timestamps = [False for i in range(86400)]
+
+    right_now = str(datetime.datetime.strftime(date,"%Y-%m-%d-%H-%M-%S"))
+    date = str(datetime.datetime.strftime(date,"%Y-%m-%d"))
+
+    # to get all apps that have been tracked since start of our app
+    all_up_apps = os.listdir("./apps/")
+
+    # to see all the running apps
+    running_apps = json.loads(open("./apps_info/info.json").read())
+
+    for i in all_up_apps:
+        try:
+            with open("./apps/"+i+"/"+date+".txt") as f:
+                lines = f.readlines()
+            for line in lines:
+                startTime,endTime,timeDuration = line.split()
+                s = int(startTime[11:13])*3600 + int(startTime[14:16])*60 + int(startTime[17:19])
+                e = int(endTime[11:13])*3600 + int(endTime[14:16])*60 + int(endTime[17:19])
+                while s<e:
+                    timestamps[s]=True
+                    s+=1
+        except:
+            continue
+    
+    min_t = "9999"
+    for i in running_apps:
+        min_t = min(min_t,running_apps[i]["startTime"])
+    
+    if min_t < date + "-00-00-00":
+        min_t = date + "-00-00-00"
+    
+    s = int(min_t[11:13])*3600 + int(min_t[14:16])*60 + int(min_t[17:19])
+    e = int(right_now[11:13])*3600 + int(right_now[14:16])*60 + int(right_now[17:19])
+    while s<e:
+        timestamps[s]=True
+        s+=1
+
+    occupiedTime = timestamps.count(True)
+    Usage = str(occupiedTime//3600)+":"+str((occupiedTime%3600)//60)+":"+str(occupiedTime%60)
+    return Usage
+
 # updates the information needed for the daily tab's GUI
 def daily_tab_monitor():
-    
     daily_dict={}
 
     try:
@@ -245,19 +286,17 @@ def daily_tab_monitor():
     except:
         daily_dict = {} # creating the log file
 
-    
     day_today = ""
     if len(str(datetime.datetime.now().date().day))==1 : day_today = " "+str(datetime.datetime.now().date().day)
     else : day_today = str(datetime.datetime.now().date().day)
     
-
-    month_str = (month_dict[datetime.datetime.now().date().month])
+    month_str = month_dict[datetime.datetime.now().date().month]
 
     date_format = month_str + " " + day_today
-    daily_dict[str(datetime.datetime.now().date())] = ["00:00:00" , get_unlock_count(date_format)]
+    daily_dict[str(datetime.datetime.now().date())] = [ get_uptime(datetime.datetime.now()) , get_unlock_count(date_format)]
     
     with open("./daily_usage.json","w+") as file:
-        file.write(json.dumps(daily_dict))
+        file.write(json.dumps(daily_dict,indent=4))
 
 if __name__ == '__main__':
     timeout = 2

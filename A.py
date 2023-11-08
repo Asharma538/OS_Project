@@ -2,7 +2,7 @@ import typing
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QLabel,QWidget,QVBoxLayout,QHBoxLayout,QApplication,QFrame,QGridLayout
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont,QLinearGradient
 import PyQt5.QtGui
 from PyQt5.QtCore import Qt, QTimer,QRect
 from PyQt5.QtGui import QPainter, QBrush, QColor, QPen, QPixmap
@@ -26,7 +26,7 @@ month_dict = {
     11:"Nov",
     12:"Dec"
 }
-
+error = 0
 
 class CircularProgressBar(QWidget): 
     def __init__(self, val=50, hrs=0, mins=0, parent=None):
@@ -94,25 +94,23 @@ class AppTile(QWidget):
         self.setFixedHeight(100)
         self.setStyleSheet("background-color : rgb(225,225,240);\n")
         self.make()
-        # self.updateTimerObj = QTimer()
-        # self.updateTimerObj.startTimer(10)
-        # self.updateTimerObj.timeout.connect(self.updateTimer)
-    
-    # def updateTimer():
-
 
 
     def make(self):
         appTileLayout = QHBoxLayout()
 
         img_label = QLabel()
-        img_label.setText("")
-        img_label.setPixmap(QPixmap("../mars.png"))
+        img_label.setText(self.name[:1])
+        font = QFont()
+        font.setPixelSize(20)
+        img_label.setFont(font)
         img_label.setScaledContents(True)
-        img_label.setFixedHeight(60)
-        img_label.setFixedWidth(60)
-        img_label.setStyleSheet("border-radius: 10px;\n")
-        
+        img_label.setFixedHeight(65)
+        img_label.setFixedWidth(65)
+        img_label.setAlignment(Qt.AlignCenter)
+
+        img_label.setStyleSheet("border-radius: 10px;\n" "background-color:#F11A7B;\n" "color:rgb(255,255,255);\n")
+
         appProperties = QWidget()
 
         appProperties.setStyleSheet("border-radius: 10px;\n")
@@ -289,32 +287,48 @@ class Top5Apps(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.timer = QTimer(self)
+        self.oldScrollWidget = None
         self.make()
         self.timer.timeout.connect(self.make)
         self.timer.start(1000)
     
     def make(self):
         self.topFiveList = selectTopFive()
-        Grid = QGridLayout()
-        for i in range(1+len(self.topFiveList)):
-            if i!=0:
-                Grid.addWidget(AppTile(self.topFiveList[i-1]["Name"],self.topFiveList[i-1]["Usage"],self.topFiveList[i-1]["Visits"]))
-            else:
-                top5Heading = QLabel("No Apps used today")
-                if len(self.topFiveList)!=0:
-                    top5Heading = QLabel(f"Top Apps with the Highest Uptime Today")
-                top5Heading.setFont(QFont("Arial",16,500))
-                top5Heading.setAlignment(Qt.AlignCenter)
-                Grid.addWidget(top5Heading)
 
-            Grid.setRowMinimumHeight(i,100)
+        appLayout = QVBoxLayout()
+        appScrollArea = QScrollArea()
+        appScrollArea.setWidgetResizable(True)
+        appScrollAreaWidgetContents = QWidget()
+        Grid = QGridLayout(appScrollAreaWidgetContents)
+
+        for i in range(len(self.topFiveList)):
+            Grid.addWidget(AppTile(self.topFiveList[i]["Name"],self.topFiveList[i]["Usage"],self.topFiveList[i]["Visits"]))
+        
+        top5Heading = QLabel("No Apps used today")
+        if len(self.topFiveList)!=0:
+            top5Heading.setText("Top Apps with the Highest Uptime Today")
+            top5Heading.setFont(QFont("Arial",16,500))
+            top5Heading.setAlignment(Qt.AlignCenter)
+            top5Heading.setStyleSheet("padding: 20px 0px 30px 0px;\n")
+        
+        appLayout.addWidget(top5Heading)
 
         Grid.setSpacing(0)
         Grid.setContentsMargins(0,0,0,0)
-        self.grid = Grid
+        Grid.setAlignment(Qt.AlignmentFlag.AlignTop)
+        appScrollArea.setWidget(appScrollAreaWidgetContents)
+
+        if self.oldScrollWidget is not None:
+            appScrollArea.verticalScrollBar().setValue(self.oldScrollWidget.verticalScrollBar().value())
+
+        appLayout.addWidget(appScrollArea)
+
         if self.layout() is not None:
             self.layout().deleteLater()
-        self.setLayout(self.grid)
+        else:
+            self.oldScrollWidget = appScrollArea
+            
+        self.setLayout(appLayout)
 
 
 def get_unlock_count(date):
@@ -329,7 +343,7 @@ def selectTopFive():
 
     with open("./apps_info/info.json") as f:
         app_info = json.loads(f.read())
-    print(app_info)
+    # print(app_info)
 
     app_names = os.listdir('./apps/')
     for _ in app_names:
@@ -349,6 +363,8 @@ def selectTopFive():
 
             if _ in app_info:
                 totalTime += datetime.datetime.strptime(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"),"%Y-%m-%d-%H-%M-%S") - datetime.datetime.strptime(app_info[_]["startTime"] , "%Y-%m-%d-%H-%M-%S")
+                if totalTime >= datetime.timedelta(days=1):
+                    totalTime = datetime.datetime.strftime(datetime.datetime.now(),"%H:%M:%S")
                 visits += 1
             app_details.append({
                 "Name": _,
@@ -358,15 +374,20 @@ def selectTopFive():
 
         except Exception as e:
             if _ in app_info:
+
+                totalTime = datetime.datetime.strptime(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"),"%Y-%m-%d-%H-%M-%S") - datetime.datetime.strptime(app_info[_]["startTime"] , "%Y-%m-%d-%H-%M-%S")
+                if totalTime >= datetime.timedelta(days=1):
+                    totalTime = datetime.datetime.strftime(datetime.datetime.now(),"%H:%M:%S")
+
                 app_details.append({
                     "Name": _,
-                    "Usage" : str(datetime.datetime.strptime(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"),"%Y-%m-%d-%H-%M-%S") - datetime.datetime.strptime(app_info[_]["startTime"] , "%Y-%m-%d-%H-%M-%S")),
+                    "Usage" : str(totalTime),
                     "Visits": "1"
                 })
 
-    print(app_details)
+    # print(app_details)
     app_details = sorted(app_details , key = timeSort , reverse= True)
-    return app_details[:5]
+    return app_details[:10]
 
 
 def timeSort(t):
@@ -387,11 +408,13 @@ def main():
     # for containing the left part of the application
     col1 = QVBoxLayout()
     
-
-    hrsSpent, minsSpent,secsSpent = 5 , 10 , 0
+    # for getting uptime of every day
+    with open("./daily_usage.json") as file :
+        dailyUsageDetails = json.loads(file.read())
+    hrsSpent, minsSpent,secsSpent = map(int,dailyUsageDetails[str(datetime.datetime.now())[:10]][0].split(":"))
     percentageTimeWidget = CircularProgressBar( math.ceil(((hrsSpent*60 + minsSpent)/1440)*100) ,hrsSpent,minsSpent)
 
-    col1.addWidget(percentageTimeWidget)
+    col1.addWidget(percentageTimeWidget,stretch=3.5)
 
     dividingLineHorizontal = QWidget()
     dividingLineHorizontal.setFixedHeight(1)
@@ -400,7 +423,7 @@ def main():
     col1.addWidget(dividingLineHorizontal)
 
     top5widget = Top5Apps()
-    col1.addWidget(top5widget)
+    col1.addWidget(top5widget,stretch=5)
 
     # for containing the right part of the application
     dividingLine = QWidget()
@@ -421,15 +444,10 @@ def main():
     dailyScrollAreaWidgetContents = QWidget()
     gridDaily = QGridLayout(dailyScrollAreaWidgetContents)
 
-    with open("./daily_usage.json") as file :
-        dailyUsageDetails = json.loads(file.read())
-
     # print(dailyUsageDetails)
 
     for i in (dailyUsageDetails):
         dailyYear , dailyMonth , dailyDate = list(map(str , i.split('-')))
-        
-        print(dailyUsageDetails[i][0] , dailyUsageDetails[i][1])
         gridDaily.addWidget(TimeTile(dailyDate, month_dict[int(dailyMonth)] ,dailyYear, dailyUsageDetails[i][0] , str(dailyUsageDetails[i][1])))
     
     gridDaily.setAlignment(Qt.AlignmentFlag.AlignTop)
@@ -487,9 +505,6 @@ def main():
 
     col2.addWidget(tabs)
 
-    col3 = QVBoxLayout()
-    col3.addWidget(QLabel("Third section"))
-
     rowMain.addLayout(col1,stretch=1)
     rowMain.addWidget(dividingLine)
     rowMain.addLayout(col2,stretch=1)
@@ -502,4 +517,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    # selectTopFive()
