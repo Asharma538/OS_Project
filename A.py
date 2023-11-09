@@ -26,7 +26,6 @@ month_dict = {
     11:"Nov",
     12:"Dec"
 }
-error = 0
 
 class CircularProgressBar(QWidget): 
     def __init__(self, val=50, hrs=0, mins=0, parent=None):
@@ -104,6 +103,7 @@ class AppTile(QWidget):
         font = QFont()
         font.setPixelSize(20)
         img_label.setFont(font)
+        # img_label.setPixmap(QPixmap(""))
         img_label.setScaledContents(True)
         img_label.setFixedHeight(65)
         img_label.setFixedWidth(65)
@@ -138,7 +138,7 @@ class AppTile(QWidget):
 
 
 class TimeTile(QWidget):
-    def __init__(self, date="01",month="01",year="01",usage="0 hrs 0 mins", unlocks="0", parent=None):
+    def __init__(self, date="01",month="01",year="01",usage="00:00:00", unlocks="0", parent=None):
         super().__init__(parent)
         self.date = date
         self.month = month
@@ -363,9 +363,10 @@ def selectTopFive():
 
             if _ in app_info:
                 totalTime += datetime.datetime.strptime(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"),"%Y-%m-%d-%H-%M-%S") - datetime.datetime.strptime(app_info[_]["startTime"] , "%Y-%m-%d-%H-%M-%S")
-                if totalTime >= datetime.timedelta(days=1):
+                if totalTime >= datetime.timedelta(hours=datetime.datetime.now().hour,minutes=datetime.datetime.now().minute):
                     totalTime = datetime.datetime.strftime(datetime.datetime.now(),"%H:%M:%S")
                 visits += 1
+                
             app_details.append({
                 "Name": _,
                 "Usage" : str(totalTime),
@@ -376,7 +377,7 @@ def selectTopFive():
             if _ in app_info:
 
                 totalTime = datetime.datetime.strptime(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"),"%Y-%m-%d-%H-%M-%S") - datetime.datetime.strptime(app_info[_]["startTime"] , "%Y-%m-%d-%H-%M-%S")
-                if totalTime >= datetime.timedelta(days=1):
+                if totalTime >= datetime.timedelta(hours=datetime.datetime.now().hour,minutes=datetime.datetime.now().minute):
                     totalTime = datetime.datetime.strftime(datetime.datetime.now(),"%H:%M:%S")
 
                 app_details.append({
@@ -409,10 +410,36 @@ def main():
     col1 = QVBoxLayout()
     
     # for getting uptime of every day
+    # Summary variables , dailyUsageDetails, weekly and monthly
     with open("./daily_usage.json") as file :
         dailyUsageDetails = json.loads(file.read())
     hrsSpent, minsSpent,secsSpent = map(int,dailyUsageDetails[str(datetime.datetime.now())[:10]][0].split(":"))
-    percentageTimeWidget = CircularProgressBar( math.ceil(((hrsSpent*60 + minsSpent)/1440)*100) ,hrsSpent,minsSpent)
+    percentageTimeWidget = CircularProgressBar( math.ceil(((hrsSpent*60 + minsSpent)/1440)*100) ,hrsSpent,minsSpent+(secsSpent>=10))
+
+
+    weeklyUsageDetails = {}
+    for i in list(dailyUsageDetails.keys())[::-1]:
+        if i != str(datetime.datetime.now())[:10]:
+            weekNumber = datetime.date(*map(int,i.split("-"))).isocalendar()[1]
+            if weekNumber not in weeklyUsageDetails:
+                # weekNumber -> [time in seconds , unlocks]
+                weeklyUsageDetails[weekNumber] = [0,0]
+            hh,mm,ss = map(int,dailyUsageDetails[i][0].split(":"))
+            weeklyUsageDetails[weekNumber][0] += hh*3600 + mm*60 + ss
+            weeklyUsageDetails[weekNumber][1] += dailyUsageDetails[i][1]
+
+
+    monthlyUsageDetails = {}
+    for i in list(dailyUsageDetails.keys())[::-1]:
+        if i != str(datetime.datetime.now())[:10]:
+            monthNumber = int(i[5:7])
+            if monthNumber not in monthlyUsageDetails:
+                # monthNumber -> [time in seconds , unlocks]
+                monthlyUsageDetails[monthNumber] = [0,0]
+            hh,mm,ss = map(int,dailyUsageDetails[i][0].split(":"))
+            monthlyUsageDetails[monthNumber][0] += hh*3600 + mm*60 + ss
+            monthlyUsageDetails[monthNumber][0] += dailyUsageDetails[i][1]
+
 
     col1.addWidget(percentageTimeWidget,stretch=3.5)
 
@@ -445,10 +472,13 @@ def main():
     gridDaily = QGridLayout(dailyScrollAreaWidgetContents)
 
     # print(dailyUsageDetails)
-
-    for i in (dailyUsageDetails):
-        dailyYear , dailyMonth , dailyDate = list(map(str , i.split('-')))
-        gridDaily.addWidget(TimeTile(dailyDate, month_dict[int(dailyMonth)] ,dailyYear, dailyUsageDetails[i][0] , str(dailyUsageDetails[i][1])))
+    for i in list(dailyUsageDetails.keys())[::-1]:
+        if i != str(datetime.datetime.now())[:10]:
+            dailyYear , dailyMonth , dailyDate = list(map(str , i.split('-')))
+            dailyYear.rjust(2,'0')
+            dailyMonth.rjust(2,'0')
+            dailyDate.rjust(2,'0')
+            gridDaily.addWidget(TimeTile(dailyDate, month_dict[int(dailyMonth)] ,dailyYear, dailyUsageDetails[i][0] , str(dailyUsageDetails[i][1])))
     
     gridDaily.setAlignment(Qt.AlignmentFlag.AlignTop)
     dailyScrollArea.setWidget(dailyScrollAreaWidgetContents)
@@ -468,8 +498,11 @@ def main():
     weeklyScrollAreaWidgetContents = QWidget()
     gridWeekly = QGridLayout(weeklyScrollAreaWidgetContents)
 
-    for i in range(20):
-        gridWeekly.addWidget(WeeklyTimeTile(2 ,"00:00:00","0"))
+
+    for i in weeklyUsageDetails:
+        weektotaltime = weeklyUsageDetails[i][0]//7
+        avg_usage_time = str(weektotaltime//3600).rjust(2,'0')+":"+str((weektotaltime%3600)//60).rjust(2,'0')+":"+str(weektotaltime%60).rjust(2,'0')
+        gridWeekly.addWidget(WeeklyTimeTile(i,avg_usage_time,str(weeklyUsageDetails[i][1]//7)))
     
     gridWeekly.setAlignment(Qt.AlignmentFlag.AlignTop)
 
@@ -490,8 +523,10 @@ def main():
     monthlyScrollAreaWidgetContents = QWidget()
     gridmonthly = QGridLayout(monthlyScrollAreaWidgetContents)
 
-    for i in range(20):
-        gridmonthly.addWidget(MonthlyTimeTile("Oct","00:00:00","0"))
+    for i in monthlyUsageDetails:
+        monthtotaltime = monthlyUsageDetails[i][0]//31
+        avg_usage_time = str(monthtotaltime//3600).rjust(2,'0')+":"+str((monthtotaltime%3600)//60).rjust(2,'0')+":"+str(monthtotaltime%60).rjust(2,'0')
+        gridmonthly.addWidget(MonthlyTimeTile(month_dict[i],avg_usage_time,str(monthlyUsageDetails[i][1]//31)))
     
     gridmonthly.setAlignment(Qt.AlignmentFlag.AlignTop)
 

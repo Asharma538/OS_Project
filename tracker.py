@@ -7,18 +7,18 @@ import datetime
 
 # global variables
 month_dict = {
-    1:"Jan",
-    2:"Feb",
-    3:"Mar",
-    4:"Apr",
-    5:"May",
-    6:"Jun",
-    7:"Jul",
-    8:"Aug",
-    9:"Sep",
-    10:"Oct",
-    11:"Nov",
-    12:"Dec"
+    1:["Jan",31],
+    2:["Feb",28],
+    3:["Mar",31],
+    4:["Apr",30],
+    5:["May",31],
+    6:["Jun",30],
+    7:["Jul",31],
+    8:["Aug",31],
+    9:["Sep",30],
+    10:["Oct",31],
+    11:["Nov",30],
+    12:["Dec",31]
 }
 list_of_apps = []
 
@@ -76,7 +76,6 @@ def get_snap_app_list():
 
     final_snap_apps = list(set(final_snap_apps))
     # print(final_snap_apps)
-
 
     base_directory = '/snap/'
     common_path = '/current/meta/gui/'
@@ -233,6 +232,7 @@ def get_unlock_count(date):
     times_list = times.split("\n")[:-1]
     return len(times_list)
 
+# gets the total uptime for the given date
 def get_uptime(date):
     timestamps = [False for i in range(86400)]
 
@@ -273,7 +273,7 @@ def get_uptime(date):
         s+=1
 
     occupiedTime = timestamps.count(True)
-    Usage = str(occupiedTime//3600)+":"+str((occupiedTime%3600)//60)+":"+str(occupiedTime%60)
+    Usage = str(occupiedTime//3600).rjust(2,'0')+":"+str((occupiedTime%3600)//60).rjust(2,'0')+":"+str(occupiedTime%60).rjust(2,'0')
     return Usage
 
 # updates the information needed for the daily tab's GUI
@@ -290,7 +290,7 @@ def daily_tab_monitor():
     if len(str(datetime.datetime.now().date().day))==1 : day_today = " "+str(datetime.datetime.now().date().day)
     else : day_today = str(datetime.datetime.now().date().day)
     
-    month_str = month_dict[datetime.datetime.now().date().month]
+    month_str = month_dict[datetime.datetime.now().date().month][0]
 
     date_format = month_str + " " + day_today
     daily_dict[str(datetime.datetime.now().date())] = [ get_uptime(datetime.datetime.now()) , get_unlock_count(date_format)]
